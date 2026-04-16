@@ -1,0 +1,119 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Lexie Readable: add public/fonts/LexieReadable.woff2 when licensed; OpenDyslexic loads as fallback */
+@font-face {
+  font-family: "Lexie Readable";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src:
+    local("Lexie Readable"),
+    url("/fonts/LexieReadable.woff2") format("woff2"),
+    url("https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/woff/OpenDyslexic-Regular.woff")
+      format("woff");
+}
+
+@font-face {
+  font-family: "OpenDyslexic";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/woff/OpenDyslexic-Regular.woff")
+    format("woff");
+}
+
+:root {
+  --bg-parchment: #f5f7fb;
+  --text-ink: #0f172a;
+  --wood-dark: #0b1018;
+  --wood-mid: #111827;
+  --gold-soft: #60a5fa;
+  --cream-panel: rgba(245, 247, 251, 0.9);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  color: var(--text-ink);
+  background:
+    radial-gradient(circle at top, rgba(96, 165, 250, 0.15), transparent 30%),
+    radial-gradient(circle at 80% 20%, rgba(34, 211, 238, 0.08), transparent 28%),
+    linear-gradient(180deg, #0b1018 0%, #111827 42%, #0f172a 100%);
+  min-height: 100dvh;
+  font-family: var(--font-ui), Arial, Helvetica, sans-serif;
+}
+
+h1,
+h2,
+h3,
+.font-display {
+  font-family: var(--font-display), Georgia, serif;
+  letter-spacing: -0.02em;
+}
+
+.reader-font,
+.story-body {
+  font-family: var(--font-story), Arial, Helvetica, sans-serif;
+}
+
+::selection {
+  background: rgba(96, 165, 250, 0.25);
+}
+
+@layer base {
+  .panel {
+    @apply rounded-[1.25rem] border border-slate-200/80 shadow-[0_16px_34px_rgba(2,6,23,0.12)];
+    background: linear-gradient(180deg, rgba(248, 250, 252, 0.98), rgba(241, 245, 249, 0.95));
+    backdrop-filter: blur(10px);
+  }
+
+  .library-shell {
+    @apply relative overflow-hidden;
+    background:
+      radial-gradient(circle at 20% 10%, rgba(255, 255, 255, 0.12), transparent 22%),
+      radial-gradient(circle at 75% 12%, rgba(96, 165, 250, 0.18), transparent 20%),
+      linear-gradient(180deg, #0b1018 0%, #111827 38%, #0f172a 100%);
+  }
+
+  .primary-button {
+    @apply inline-flex min-h-[46px] items-center justify-center rounded-xl px-6 py-2.5 text-base font-semibold text-white shadow-[0_10px_20px_rgba(0,0,0,0.18)] transition;
+    background: linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%);
+  }
+
+  .primary-button:hover {
+    filter: brightness(1.03);
+    transform: translateY(-1px);
+  }
+
+  .secondary-button {
+    @apply inline-flex min-h-[44px] items-center justify-center rounded-xl border border-slate-500/55 bg-slate-900/35 px-6 py-2 text-sm font-semibold text-slate-100 shadow-[0_8px_16px_rgba(0,0,0,0.2)] transition;
+  }
+
+  .secondary-button:hover {
+    background: rgba(15, 23, 42, 0.65);
+    border-color: rgba(148, 163, 184, 0.75);
+    transform: translateY(-1px);
+  }
+}
+
+@layer utilities {
+  .story-body {
+    @apply reader-font text-ink bg-parchment;
+    font-size: 1.375rem;
+    font-style: normal;
+    line-height: 1.9;
+    letter-spacing: 0.02em;
+    word-spacing: 0.08em;
+    text-align: left;
+    hyphens: none;
+    max-width: 43rem;
+  }
+
+  .soft-shadow {
+    box-shadow: 0 18px 38px rgba(15, 23, 42, 0.14);
+  }
+}

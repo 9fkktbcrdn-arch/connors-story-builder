@@ -1,0 +1,18 @@
+{
+  "name": "Connor's Story Builder",
+  "short_name": "Story Builder",
+  "description": "Magical choose-your-own-adventure stories with read-aloud support.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FFF8F0",
+  "theme_color": "#D4A84B",
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

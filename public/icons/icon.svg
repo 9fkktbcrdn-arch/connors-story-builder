@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Book">
+  <rect width="512" height="512" rx="96" fill="#5C3A21"/>
+  <path fill="#D4A84B" d="M128 96h192c26.5 0 48 21.5 48 48v320c0 13.3-10.7 24-24 24H128c-26.5 0-48-21.5-48-48V144c0-26.5 21.5-48 48-48z"/>
+  <path fill="#FFF8F0" d="M152 128h160v8H152zm0 40h160v8H152zm0 40h120v8H152z"/>
+  <circle cx="384" cy="160" r="48" fill="#4ECDC4" opacity=".9"/>
+</svg>
