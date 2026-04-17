@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { useOpenAITts } from "@/hooks/useOpenAITts";
 import type { ReadingLevelKey, ReadingMode, StoryChoice } from "@/types/story";
 import { AudioControls } from "./AudioControls";
@@ -88,12 +88,9 @@ export function ChapterView({
     return () => clearTimeout(timer);
   }, [readingMode, hasFinished]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!autoPlay || readingMode !== "read_to_me") return;
-    const timer = window.setTimeout(() => {
-      void speak();
-    }, 250);
-    return () => window.clearTimeout(timer);
+    void speak();
   }, [autoPlay, readingMode, speak, chapterNumber]);
 
   useEffect(() => {
@@ -197,6 +194,7 @@ export function ChapterView({
   const handleChoose = useCallback(
     async (choiceText: string) => {
       if (!canContinue || continueLoading) return;
+      setShowChoices(false);
       setContinueLoading(true);
       setContinueError(null);
       stop();
@@ -213,6 +211,7 @@ export function ChapterView({
         const data = await res.json();
         if (!res.ok) {
           setContinueError(data.error || "Could not continue story.");
+          if (readingMode === "read_to_me") setShowChoices(true);
           return;
         }
         const nextUrl =
@@ -223,6 +222,7 @@ export function ChapterView({
         router.refresh();
       } catch {
         setContinueError("Network issue while continuing story.");
+        if (readingMode === "read_to_me") setShowChoices(true);
       } finally {
         setContinueLoading(false);
       }

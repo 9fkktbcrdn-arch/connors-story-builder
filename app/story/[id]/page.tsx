@@ -62,6 +62,7 @@ export default async function StoryPage({ params, searchParams }: Props) {
 
   return (
     <ChapterView
+      key={`${id}-${targetChapter}`}
       storyId={id}
       storyTitle={story.title}
       chapterNumber={chapter.chapter_number}

@@ -1,11 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
-  buildWordRanges,
-  findWordIndexAtChar,
-  type WordRange,
-} from "@/lib/reader/tokenize";
+  buildWordSpeechWeights,
+  wordIndexAtWeightedProgress,
+} from "@/lib/reader/highlightProgress";
+import { buildWordRanges, type WordRange } from "@/lib/reader/tokenize";
 
 export type SpeechPlayback = "idle" | "speaking" | "paused" | "ended";
 
@@ -32,6 +32,57 @@ export function useOpenAITts(fullText: string, rate: number, voice: string) {
   const audioUrlRef = useRef<string | null>(null);
   const audioKeyRef = useRef<string>("");
   const rangesRef = useRef<WordRange[]>(buildWordRanges(fullText));
+  const cumulativeRef = useRef<number[]>([]);
+  const weightTotalRef = useRef(1);
+  const rafRef = useRef<number | null>(null);
+  const ensureGenRef = useRef(0);
+
+  const wordRanges = useMemo(() => buildWordRanges(fullText), [fullText]);
+  const { cumulative, total: weightTotal } = useMemo(
+    () => buildWordSpeechWeights(wordRanges),
+    [wordRanges]
+  );
+
+  useEffect(() => {
+    rangesRef.current = wordRanges;
+    cumulativeRef.current = cumulative;
+    weightTotalRef.current = weightTotal;
+  }, [wordRanges, cumulative, weightTotal]);
+
+  const stopRaf = useCallback(() => {
+    if (rafRef.current !== null) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
+  }, []);
+
+  const updateHighlightFromAudio = useCallback(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    const duration = Number.isFinite(audio.duration) ? audio.duration : 0;
+    if (!duration || duration <= 0) return;
+    const progress = Math.max(0, Math.min(1, audio.currentTime / duration));
+    const idx = wordIndexAtWeightedProgress(
+      cumulativeRef.current,
+      weightTotalRef.current,
+      progress
+    );
+    setCurrentWordIndex(idx);
+  }, []);
+
+  const startRafLoop = useCallback(() => {
+    stopRaf();
+    const tick = () => {
+      const audio = audioRef.current;
+      if (!audio || audio.paused || audio.ended) {
+        rafRef.current = null;
+        return;
+      }
+      updateHighlightFromAudio();
+      rafRef.current = requestAnimationFrame(tick);
+    };
+    rafRef.current = requestAnimationFrame(tick);
+  }, [stopRaf, updateHighlightFromAudio]);
 
   const getProgress = useCallback(() => {
     const audio = audioRef.current;
@@ -41,15 +92,10 @@ export function useOpenAITts(fullText: string, rate: number, voice: string) {
     return Math.max(0, Math.min(1, audio.currentTime / duration));
   }, []);
 
-  const wordRanges = useMemo(() => buildWordRanges(fullText), [fullText]);
-  useEffect(() => {
-    rangesRef.current = wordRanges;
-  }, [wordRanges]);
-
   const cleanupAudio = useCallback(() => {
+    stopRaf();
     const audio = audioRef.current;
     if (audio) {
-      audio.ontimeupdate = null;
       audio.onpause = null;
       audio.onplay = null;
       audio.onended = null;
@@ -62,39 +108,48 @@ export function useOpenAITts(fullText: string, rate: number, voice: string) {
       URL.revokeObjectURL(audioUrlRef.current);
       audioUrlRef.current = null;
     }
-  }, []);
+  }, [stopRaf]);
 
   const attachAudio = useCallback(
     (audio: HTMLAudioElement) => {
-      audio.ontimeupdate = () => {
-        const duration = Number.isFinite(audio.duration) ? audio.duration : 0;
-        if (!duration || duration <= 0) return;
-        const progress = Math.max(0, Math.min(1, audio.currentTime / duration));
-        const estCharIndex = Math.floor(progress * Math.max(0, fullText.length - 1));
-        const idx = findWordIndexAtChar(rangesRef.current, estCharIndex);
-        setCurrentWordIndex(idx);
-      };
       audio.onpause = () => {
-        // On ended, onended will run and set explicit ended state.
+        stopRaf();
         if (!audio.ended) setPlayback("paused");
       };
-      audio.onplay = () => setPlayback("speaking");
+      audio.onplay = () => {
+        setPlayback("speaking");
+        startRafLoop();
+      };
       audio.onended = () => {
+        stopRaf();
         setPlayback("ended");
         setCurrentWordIndex(null);
       };
       audio.onerror = () => {
+        stopRaf();
         setPlayback("idle");
         setSpeechError("Narration audio failed. Try play again.");
       };
     },
-    [fullText.length]
+    [startRafLoop, stopRaf]
   );
+
+  /** New chapter / navigation: reset before paint so autoplay and choice UI see a clean state. */
+  useLayoutEffect(() => {
+    ensureGenRef.current += 1;
+    cleanupAudio();
+    setPlayback("idle");
+    setCurrentWordIndex(null);
+    setSpeechError(null);
+    setIsLoadingAudio(false);
+    audioKeyRef.current = "";
+  }, [fullText, cleanupAudio]);
 
   const ensureAudio = useCallback(async () => {
     const key = `${voice}|${rate}|${fullText}`;
     if (audioRef.current && audioKeyRef.current === key) return audioRef.current;
 
+    const myGen = ++ensureGenRef.current;
     setIsLoadingAudio(true);
     setSpeechError(null);
     cleanupAudio();
@@ -108,6 +163,10 @@ export function useOpenAITts(fullText: string, rate: number, voice: string) {
         speed: rate,
       }),
     });
+    if (myGen !== ensureGenRef.current) {
+      setIsLoadingAudio(false);
+      throw new Error("Narration was replaced by a newer request.");
+    }
     if (!res.ok) {
       let msg = "Could not generate narration audio.";
       try {
@@ -120,6 +179,11 @@ export function useOpenAITts(fullText: string, rate: number, voice: string) {
     }
 
     const blob = await res.blob();
+    if (myGen !== ensureGenRef.current) {
+      setIsLoadingAudio(false);
+      throw new Error("Narration was replaced by a newer request.");
+    }
+
     const url = URL.createObjectURL(blob);
     const audio = new Audio(url);
     audio.preload = "auto";
@@ -137,6 +201,7 @@ export function useOpenAITts(fullText: string, rate: number, voice: string) {
       await audio.play();
     } catch (e) {
       setIsLoadingAudio(false);
+      if (e instanceof Error && e.message.includes("replaced")) return;
       setPlayback("idle");
       setSpeechError(e instanceof Error ? e.message : "Could not play narration.");
     }
@@ -183,6 +248,7 @@ export function useOpenAITts(fullText: string, rate: number, voice: string) {
         });
       } catch (e) {
         setIsLoadingAudio(false);
+        if (e instanceof Error && e.message.includes("replaced")) return;
         setPlayback("idle");
         setSpeechError(e instanceof Error ? e.message : "Could not play narration.");
       }
@@ -205,6 +271,7 @@ export function useOpenAITts(fullText: string, rate: number, voice: string) {
   }, [speak]);
 
   const stop = useCallback(() => {
+    stopRaf();
     if (!audioRef.current) {
       setPlayback("idle");
       setCurrentWordIndex(null);
@@ -214,13 +281,14 @@ export function useOpenAITts(fullText: string, rate: number, voice: string) {
     audioRef.current.currentTime = 0;
     setPlayback("idle");
     setCurrentWordIndex(null);
-  }, []);
+  }, [stopRaf]);
 
   useEffect(() => {
     return () => {
+      stopRaf();
       cleanupAudio();
     };
-  }, [cleanupAudio]);
+  }, [cleanupAudio, stopRaf]);
 
   return {
     playback,
@@ -239,4 +307,3 @@ export function useOpenAITts(fullText: string, rate: number, voice: string) {
     stop,
   };
 }
-
