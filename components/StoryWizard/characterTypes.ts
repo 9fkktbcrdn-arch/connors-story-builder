@@ -1,14 +1,14 @@
 /**
- * Optional role tags for characters — genre-neutral (military, contemporary, sci‑fi, sports, etc.).
- * Not fantasy-specific; the model should follow the premise and setting for actual genre.
+ * Optional role tags — mix of classic adventure / fantasy-friendly labels and open roles.
+ * The model should follow the premise and setting; tags are hints, not a fixed genre.
  */
 export const CHARACTER_TYPES = [
-  { id: "leader", label: "Leader" },
-  { id: "specialist", label: "Specialist" },
-  { id: "teammate", label: "Teammate" },
+  { id: "hero", label: "Hero" },
+  { id: "ally", label: "Ally" },
   { id: "mentor", label: "Mentor" },
-  { id: "adversary", label: "Adversary" },
-  { id: "civilian", label: "Civilian" },
-  { id: "rookie", label: "Rookie" },
+  { id: "rival", label: "Rival" },
+  { id: "knight", label: "Knight" },
+  { id: "wizard", label: "Wizard" },
+  { id: "dragon", label: "Dragon" },
   { id: "other", label: "Other" },
 ] as const;

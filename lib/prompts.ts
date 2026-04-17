@@ -45,15 +45,15 @@ ${chars || "(none specified)"}
 - Reading level: ${effectiveLevel}
 
 Creativity and variety (critical):
-- Every story must feel distinct. Invent imagery, stakes, and obstacles directly from the premise, setting, mood, and characters above.
-- **Genre fidelity:** Infer genre from the premise, setting, and mood (e.g. military, contemporary realism, sports, science fiction, historical, mystery, fantasy). Stay in that genre. Do not add medieval fantasy elements—knights, wizards, dragons, castles, sorcery, prophecies—unless the user clearly asked for fantasy or medieval fiction.
-- Character role tags in the list (Leader, Specialist, etc.) are **generic roles**, not a fantasy cast list. Interpret them in the correct genre (e.g. Leader = commanding officer or team captain, not necessarily a knight).
-- Do NOT lean on generic fantasy clichés unless the user explicitly asked for them. Avoid overused motifs such as: glowing footprints/trails, mysterious disembodied whispers, "strange symbols" on walls, generic riddling doors, or "an ancient evil awakening" unless they truly fit THIS premise.
+- Every story must feel distinct. Invent imagery, stakes, and obstacles from the premise, setting, mood, and characters above.
+- **Follow the reader's world:** Match whatever genre the premise and setting imply—fantasy, medieval, dragons, fairy tales, science fiction, mystery, sports, historical, contemporary, military, etc. Do not import a different genre on top of the user's idea (e.g. no random sorcerers in a straight military drama; no courtroom drama beats in a dragon quest unless the premise invites it).
+- Optional character tags (Hero, Knight, Dragon, etc.) are loose hints—interpret them in the story's actual setting (a "Knight" in a space-opera might be a sworn protector, not plate armor, unless that fits).
+- Do NOT lean on tired clichés unless they truly fit. Avoid overused motifs such as: glowing footprints/trails, disembodied whispers, "strange symbols" on walls, generic riddling doors, or "an ancient evil awakening" as a default crutch.
 - Do NOT copy or paraphrase any example JSON strings you may have seen in other instructions—those are structural templates only, not story content.
 - Choices must branch the plot in clearly different directions (tone, risk, location, or alliance)—not three flavors of the same next beat.
 
 Rules:
-1. Write in second person ("You ...") for immersion. Vary how scenes open; do not start every chapter in a cave unless the premise demands it.
+1. Write in second person ("You ...") for immersion. Open scenes in ways that fit this story, not a generic template.
 2. Keep chapters SHORT — target about **280–400 words** when it still feels complete (snappier listen, lower cost); hard cap around 500 words
 3. Break text into short paragraphs (2-3 sentences each) for readability
 4. End each chapter on a moment of tension, wonder, or decision
@@ -109,9 +109,9 @@ Story context:
 - Reading level: ${effectiveLevel}
 
 Creativity and variety (critical):
-- Continue in a way that honors the SELECTED CHOICE and prior chapters, but keep inventing fresh specifics—do not default to a "standard adventure" plot.
-- **Genre fidelity:** Match the established genre from premise, setting, mood, and prior chapters. Do not drift into medieval fantasy (knights, wizards, dragons, sorcery) if the story is military, realistic, sci‑fi, sports, etc., unless the user clearly wanted fantasy.
-- Character role tags (Leader, Specialist, etc.) are genre-neutral roles—interpret them in the story's actual world, not as fantasy archetypes.
+- Continue in a way that honors the SELECTED CHOICE and prior chapters, but keep inventing fresh specifics—do not default to a single "stock adventure" plot.
+- **Stay in the story's world:** Keep the same genre and tone the reader already chose (fantasy, dragon tales, sci‑fi, mystery, military, contemporary, etc.). Do not suddenly introduce a different genre's default tropes unless the plot naturally earns it.
+- Optional character tags are hints only—keep them consistent with the established setting.
 - Avoid repeating the same magical motif in chapter after chapter (e.g. glowing trails, footprints, disembodied voices) unless the user or prior text explicitly established it.
 - Do NOT copy example JSON strings from instructions—only output your own original text in the required shape.
 - The three next choices must diverge meaningfully (not three near-synonyms).

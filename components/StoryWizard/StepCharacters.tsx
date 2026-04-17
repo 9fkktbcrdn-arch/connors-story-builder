@@ -70,7 +70,7 @@ export function StepCharacters({ characters, onChange }: Props) {
                   value={c.name}
                   onChange={(e) => update(c.id, { name: e.target.value })}
                   className="w-full min-h-[42px] rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 outline-none focus:border-blue-500"
-                  placeholder="e.g. Sgt. Maria Okonkwo"
+                  placeholder="e.g. Rowan, Captain Voss, Ember the dragon..."
                 />
               </div>
             </div>
