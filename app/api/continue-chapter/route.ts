@@ -145,7 +145,7 @@ export async function POST(request: Request) {
         { role: "system", content: system },
         { role: "user", content: user },
       ],
-      temperature: 0.85,
+      temperature: 0.92,
     });
 
     const raw = completion.choices[0]?.message?.content;

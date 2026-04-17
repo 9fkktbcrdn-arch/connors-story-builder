@@ -79,7 +79,7 @@ export async function POST(request: Request) {
             "Write chapter 1 of this adventure. Remember: JSON only, with storyTitle, chapterTitle, content, summary, imagePrompt, and exactly three choices.",
         },
       ],
-      temperature: 0.85,
+      temperature: 0.92,
     });
 
     const raw = completion.choices[0]?.message?.content;
