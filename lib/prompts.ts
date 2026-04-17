@@ -46,6 +46,8 @@ ${chars || "(none specified)"}
 
 Creativity and variety (critical):
 - Every story must feel distinct. Invent imagery, stakes, and obstacles directly from the premise, setting, mood, and characters above.
+- **Genre fidelity:** Infer genre from the premise, setting, and mood (e.g. military, contemporary realism, sports, science fiction, historical, mystery, fantasy). Stay in that genre. Do not add medieval fantasy elements—knights, wizards, dragons, castles, sorcery, prophecies—unless the user clearly asked for fantasy or medieval fiction.
+- Character role tags in the list (Leader, Specialist, etc.) are **generic roles**, not a fantasy cast list. Interpret them in the correct genre (e.g. Leader = commanding officer or team captain, not necessarily a knight).
 - Do NOT lean on generic fantasy clichés unless the user explicitly asked for them. Avoid overused motifs such as: glowing footprints/trails, mysterious disembodied whispers, "strange symbols" on walls, generic riddling doors, or "an ancient evil awakening" unless they truly fit THIS premise.
 - Do NOT copy or paraphrase any example JSON strings you may have seen in other instructions—those are structural templates only, not story content.
 - Choices must branch the plot in clearly different directions (tone, risk, location, or alliance)—not three flavors of the same next beat.
@@ -108,6 +110,8 @@ Story context:
 
 Creativity and variety (critical):
 - Continue in a way that honors the SELECTED CHOICE and prior chapters, but keep inventing fresh specifics—do not default to a "standard adventure" plot.
+- **Genre fidelity:** Match the established genre from premise, setting, mood, and prior chapters. Do not drift into medieval fantasy (knights, wizards, dragons, sorcery) if the story is military, realistic, sci‑fi, sports, etc., unless the user clearly wanted fantasy.
+- Character role tags (Leader, Specialist, etc.) are genre-neutral roles—interpret them in the story's actual world, not as fantasy archetypes.
 - Avoid repeating the same magical motif in chapter after chapter (e.g. glowing trails, footprints, disembodied voices) unless the user or prior text explicitly established it.
 - Do NOT copy example JSON strings from instructions—only output your own original text in the required shape.
 - The three next choices must diverge meaningfully (not three near-synonyms).

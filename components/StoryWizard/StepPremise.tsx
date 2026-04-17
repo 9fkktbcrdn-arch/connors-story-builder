@@ -53,7 +53,7 @@ export function StepPremise({ value, onChange, canContinue }: Props) {
         rows={6}
         autoComplete="off"
         placeholder={
-          'Example: A dragon who can\'t fly but discovers something even better...\nOr: A secret kingdom hidden under the ocean...'
+          "Example: A recon team must reach an extraction point before dawn — comms are down and someone on the inside may be compromised.\nOr: Two siblings find evidence their quiet town is covering up a dangerous industrial accident."
         }
         className="min-h-[10rem] w-full resize-y rounded-xl border border-slate-300 bg-white px-4 py-3 text-base text-slate-900 placeholder:text-slate-400 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
       />

@@ -43,7 +43,7 @@ export function StepSetting({
           value={setting}
           onChange={(e) => onSetting(e.target.value)}
           className="w-full min-h-[42px] rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 outline-none focus:border-blue-500"
-          placeholder="Enchanted forest, space station, underwater city..."
+          placeholder="e.g. U.S. Army forward operating base in a mountain province; suburban high school; near-Earth orbit research station..."
         />
       </div>
       <div>
@@ -75,7 +75,7 @@ export function StepSetting({
           onChange={(e) => onExtraRules(e.target.value)}
           rows={3}
           className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 outline-none focus:border-blue-500"
-          placeholder='Magic is real, animals can talk, time moves differently...'
+          placeholder="e.g. Stick to realistic military gear and procedures; no supernatural elements; humor is dry, not slapstick..."
         />
       </div>
     </div>

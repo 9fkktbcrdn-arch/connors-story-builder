@@ -70,11 +70,11 @@ export function StepCharacters({ characters, onChange }: Props) {
                   value={c.name}
                   onChange={(e) => update(c.id, { name: e.target.value })}
                   className="w-full min-h-[42px] rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 outline-none focus:border-blue-500"
-                  placeholder="e.g. Finn the Brave"
+                  placeholder="e.g. Sgt. Maria Okonkwo"
                 />
               </div>
             </div>
-            <p className="mt-3 text-sm font-medium text-slate-600">Type (optional)</p>
+            <p className="mt-3 text-sm font-medium text-slate-600">Role (optional)</p>
             <div className="mt-2 flex flex-wrap gap-2">
               {CHARACTER_TYPES.map((t) => (
                 <button
