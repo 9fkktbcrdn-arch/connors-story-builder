@@ -38,11 +38,35 @@ function cacheKey(
   return `${chunkIdx}|${voice}|${rate}|${text.length}|${text.slice(0, 80)}`;
 }
 
+function isAutoplayBlocked(err: unknown): boolean {
+  return (
+    typeof err === "object" &&
+    err !== null &&
+    "name" in err &&
+    (err as DOMException).name === "NotAllowedError"
+  );
+}
+
+/** iOS Safari: inline playback + avoid fullscreen / remote picker quirks. */
+function configureAudioElement(audio: HTMLAudioElement) {
+  audio.preload = "auto";
+  audio.setAttribute("playsinline", "true");
+  audio.setAttribute("webkit-playsinline", "true");
+  try {
+    (audio as HTMLAudioElement & { disableRemotePlayback?: boolean }).disableRemotePlayback =
+      true;
+  } catch {
+    /* optional */
+  }
+}
+
 export function useOpenAITts(fullText: string, rate: number, voice: string) {
   const [playback, setPlayback] = useState<SpeechPlayback>("idle");
   const [currentWordIndex, setCurrentWordIndex] = useState<number | null>(null);
   const [speechError, setSpeechError] = useState<string | null>(null);
   const [isLoadingAudio, setIsLoadingAudio] = useState(false);
+  /** iPad/Safari blocked autoplay until the user taps again. */
+  const [needsUserGesture, setNeedsUserGesture] = useState(false);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioUrlRef = useRef<string | null>(null);
@@ -161,6 +185,7 @@ export function useOpenAITts(fullText: string, rate: number, voice: string) {
     setCurrentWordIndex(null);
     setSpeechError(null);
     setIsLoadingAudio(false);
+    setNeedsUserGesture(false);
   }, [fullText, voice, rate, cleanupCurrentAudio]);
 
   const fetchChunkBlob = useCallback(
@@ -190,6 +215,30 @@ export function useOpenAITts(fullText: string, rate: number, voice: string) {
       return res.blob();
     },
     [rate, voice]
+  );
+
+  /** Warm the next chunk in the background so Safari has less gap between clips. */
+  const prefetchNextChunk = useCallback(
+    (nextIdx: number, myOp: number) => {
+      queueMicrotask(() => {
+        void (async () => {
+          if (myOp !== opIdRef.current) return;
+          const list = chunksRef.current;
+          if (nextIdx >= list.length) return;
+          const ch = list[nextIdx]!;
+          const key = cacheKey(nextIdx, voice, rate, ch.text);
+          if (blobCacheRef.current.has(key)) return;
+          try {
+            const blob = await fetchChunkBlob(ch.text, myOp);
+            if (myOp !== opIdRef.current) return;
+            blobCacheRef.current.set(key, blob);
+          } catch {
+            /* ignore prefetch errors */
+          }
+        })();
+      });
+    },
+    [fetchChunkBlob, voice, rate]
   );
 
   const playChunkAtIndex = useCallback(
@@ -223,7 +272,7 @@ export function useOpenAITts(fullText: string, rate: number, voice: string) {
       cleanupCurrentAudio();
       const url = URL.createObjectURL(blob);
       const audio = new Audio(url);
-      audio.preload = "auto";
+      configureAudioElement(audio);
       audioUrlRef.current = url;
       audioRef.current = audio;
 
@@ -246,7 +295,7 @@ export function useOpenAITts(fullText: string, rate: number, voice: string) {
         setSpeechError("Narration audio failed. Try play again.");
       };
 
-      const startPlayback = async () => {
+      const startPlayback = async (): Promise<boolean> => {
         const duration = Number.isFinite(audio.duration) ? audio.duration : 0;
         if (duration > 0 && seekFrac !== null) {
           audio.currentTime = Math.max(
@@ -254,11 +303,24 @@ export function useOpenAITts(fullText: string, rate: number, voice: string) {
             Math.min(duration * 0.999, seekFrac * duration)
           );
         }
-        await audio.play();
+        try {
+          await audio.play();
+        } catch (e) {
+          if (isAutoplayBlocked(e)) {
+            setNeedsUserGesture(true);
+            setPlayback("idle");
+            cleanupCurrentAudio();
+            return false;
+          }
+          throw e;
+        }
+        prefetchNextChunk(chunkIdx + 1, myOp);
+        return true;
       };
 
       if (audio.readyState >= 1) {
-        await startPlayback();
+        const ok = await startPlayback();
+        if (!ok) return;
         return;
       }
 
@@ -266,7 +328,11 @@ export function useOpenAITts(fullText: string, rate: number, voice: string) {
         const onLoaded = async () => {
           cleanup();
           try {
-            await startPlayback();
+            const ok = await startPlayback();
+            if (!ok) {
+              resolve();
+              return;
+            }
             resolve();
           } catch (e) {
             reject(e);
@@ -284,13 +350,26 @@ export function useOpenAITts(fullText: string, rate: number, voice: string) {
         audio.addEventListener("error", onError, { once: true });
       });
     },
-    [cleanupCurrentAudio, fetchChunkBlob, startRafLoop, stopRaf, rate, voice]
+    [
+      cleanupCurrentAudio,
+      fetchChunkBlob,
+      prefetchNextChunk,
+      startRafLoop,
+      stopRaf,
+      rate,
+      voice,
+    ]
   );
 
   playChunkAtIndexRef.current = playChunkAtIndex;
 
+  const dismissAutoplayBlock = useCallback(() => {
+    setNeedsUserGesture(false);
+  }, []);
+
   const speak = useCallback(async () => {
     const myOp = ++opIdRef.current;
+    setNeedsUserGesture(false);
     setSpeechError(null);
     chunkIndexRef.current = 0;
     cleanupCurrentAudio();
@@ -332,6 +411,7 @@ export function useOpenAITts(fullText: string, rate: number, voice: string) {
   const seekAndPlay = useCallback(
     async (progress: number) => {
       const myOp = ++opIdRef.current;
+      setNeedsUserGesture(false);
       const list = chunksRef.current;
       const total = wordRangesRef.current.length;
       if (!total || list.length === 0) return;
@@ -381,7 +461,11 @@ export function useOpenAITts(fullText: string, rate: number, voice: string) {
     if (!audioRef.current) return speak();
     try {
       await audioRef.current.play();
-    } catch {
+    } catch (e) {
+      if (isAutoplayBlocked(e)) {
+        setNeedsUserGesture(true);
+        return;
+      }
       setSpeechError("Could not resume narration.");
     }
   }, [speak]);
@@ -389,6 +473,7 @@ export function useOpenAITts(fullText: string, rate: number, voice: string) {
   const stop = useCallback(() => {
     opIdRef.current += 1;
     stopRaf();
+    setNeedsUserGesture(false);
     if (!audioRef.current) {
       setPlayback("idle");
       setCurrentWordIndex(null);
@@ -426,5 +511,7 @@ export function useOpenAITts(fullText: string, rate: number, voice: string) {
     pause,
     resume,
     stop,
+    needsUserGesture,
+    dismissAutoplayBlock,
   };
 }

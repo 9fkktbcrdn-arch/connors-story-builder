@@ -9,7 +9,8 @@ export type TtsChunkSpan = {
   lastWordIndex: number;
 };
 
-const DEFAULT_MAX_CHARS = 420;
+/** Larger chunks = fewer TTS API calls per chapter (cost). ~900 keeps clips short enough for decent highlight sync. */
+const DEFAULT_MAX_CHARS = 900;
 
 /**
  * Pack words into chunks under `maxChars` (character span from first to last word).

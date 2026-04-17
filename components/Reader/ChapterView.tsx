@@ -71,6 +71,8 @@ export function ChapterView({
     stop,
     isLoadingAudio,
     voices,
+    needsUserGesture,
+    dismissAutoplayBlock,
   } = useOpenAITts(content, rate, voiceURI);
 
   useEffect(() => {
@@ -409,6 +411,23 @@ export function ChapterView({
 
       <div className="fixed bottom-0 left-0 right-0 z-20 border-t-2 border-gold/40 bg-parchment/95 px-3 py-4 shadow-[0_-8px_24px_rgba(0,0,0,0.08)] backdrop-blur-sm">
         <div className="mx-auto max-w-measure">
+          {readingMode === "read_to_me" && needsUserGesture && (
+            <div className="mb-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-3 text-center sm:px-4">
+              <p className="text-sm font-medium text-amber-950">
+                Tap the big button to start the narrator (iPad sometimes blocks auto-play).
+              </p>
+              <button
+                type="button"
+                className="primary-button mt-3 min-h-[52px] w-full max-w-sm touch-manipulation text-base"
+                onClick={() => {
+                  dismissAutoplayBlock();
+                  void speak();
+                }}
+              >
+                Start narration
+              </button>
+            </div>
+          )}
           <AudioControls
             playback={playback}
             isSpeaking={isSpeaking}

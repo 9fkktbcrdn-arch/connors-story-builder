@@ -54,7 +54,7 @@ export function AudioControls({
               type="button"
               onClick={onPlay}
               disabled={isLoadingAudio}
-              className="min-h-[46px] min-w-[96px] rounded-xl bg-teal px-4 text-base font-bold text-white shadow-md hover:brightness-105"
+              className="min-h-[52px] min-w-[100px] touch-manipulation rounded-xl bg-teal px-4 text-base font-bold text-white shadow-md hover:brightness-105"
             >
               {isLoadingAudio ? "Loading..." : "Play"}
             </button>
@@ -63,7 +63,7 @@ export function AudioControls({
             <button
               type="button"
               onClick={onPause}
-              className="min-h-[46px] min-w-[96px] rounded-xl bg-wood px-4 text-base font-semibold text-parchment hover:brightness-110"
+              className="min-h-[52px] min-w-[100px] touch-manipulation rounded-xl bg-wood px-4 text-base font-semibold text-parchment hover:brightness-110"
             >
               Pause
             </button>
@@ -72,7 +72,7 @@ export function AudioControls({
             <button
               type="button"
               onClick={onResume}
-              className="min-h-[46px] min-w-[96px] rounded-xl bg-teal px-4 text-base font-bold text-white shadow-md hover:brightness-105"
+              className="min-h-[52px] min-w-[100px] touch-manipulation rounded-xl bg-teal px-4 text-base font-bold text-white shadow-md hover:brightness-105"
             >
               Resume
             </button>
@@ -80,7 +80,7 @@ export function AudioControls({
           <button
             type="button"
             onClick={onRestart}
-            className="min-h-[46px] rounded-xl border-2 border-gold bg-parchment px-4 text-base font-semibold text-wood hover:bg-white"
+            className="min-h-[52px] touch-manipulation rounded-xl border-2 border-gold bg-parchment px-4 text-base font-semibold text-wood hover:bg-white"
           >
             Start over
           </button>
@@ -88,7 +88,7 @@ export function AudioControls({
         <button
           type="button"
           onClick={() => setExpanded((s) => !s)}
-          className="min-h-[42px] rounded-lg border border-wood/25 px-3 text-sm font-medium text-wood hover:bg-parchment"
+          className="min-h-[48px] touch-manipulation rounded-lg border border-wood/25 px-3 text-sm font-medium text-wood hover:bg-parchment"
           aria-expanded={expanded}
         >
           {expanded ? "Less options" : "More options"}
@@ -105,7 +105,7 @@ export function AudioControls({
                 key={r}
                 type="button"
                 onClick={() => onRateChange(r)}
-                className={`min-h-[44px] min-w-[52px] rounded-lg border-2 px-3 text-base font-semibold ${
+                className={`min-h-[48px] min-w-[52px] touch-manipulation rounded-lg border-2 px-3 text-base font-semibold ${
                   rate === r
                     ? "border-teal bg-teal/15 text-wood"
                     : "border-wood/20 bg-parchment text-ink hover:border-gold"
@@ -125,7 +125,7 @@ export function AudioControls({
               id="voice"
               value={voiceURI}
               onChange={(e) => onVoiceURI(e.target.value)}
-              className="min-h-[48px] w-full rounded-xl border-2 border-wood/20 bg-white px-3 text-base text-ink"
+              className="min-h-[52px] w-full touch-manipulation rounded-xl border-2 border-wood/20 bg-white px-3 text-base text-ink"
             >
               {availableVoices.map((v) => (
                 <option key={v.id} value={v.id}>

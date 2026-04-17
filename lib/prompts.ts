@@ -54,7 +54,7 @@ Creativity and variety (critical):
 
 Rules:
 1. Write in second person ("You ...") for immersion. Vary how scenes open; do not start every chapter in a cave unless the premise demands it.
-2. Keep chapters SHORT — approximately 300-500 words (about 2-3 minutes of reading)
+2. Keep chapters SHORT — target about **280–400 words** when it still feels complete (snappier listen, lower cost); hard cap around 500 words
 3. Break text into short paragraphs (2-3 sentences each) for readability
 4. End each chapter on a moment of tension, wonder, or decision
 5. After the chapter text, provide exactly 3 choices for what happens next
@@ -118,7 +118,7 @@ Creativity and variety (critical):
 
 Rules:
 1. Write in second person ("You ..."). Match voice to mood and setting.
-2. Keep chapters SHORT — approximately 300-500 words
+2. Keep chapters SHORT — target about **280–400 words** when it still feels complete; hard cap around 500 words
 3. Break text into short paragraphs (2-3 sentences each)
 4. Continue naturally from prior chapters while honoring continuity and the selected choice
 5. End on a moment of tension, wonder, or decision
